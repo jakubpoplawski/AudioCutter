@@ -64,3 +64,4 @@ venv.bak/
 .idea/
 
 .test_files/
+.notes/
