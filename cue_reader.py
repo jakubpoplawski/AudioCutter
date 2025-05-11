@@ -40,7 +40,7 @@ class CueSheet():
     def sheet_reader_liner(self):
         current_track_name = None  
         with open(pathlib.Path(
-            resource_path('.test_files/source_files/szczelina.cue'))) \
+            resource_path('.test_files/source_files/skaza.cue'))) \
                 as cue_file:
             for line in cue_file:
                 if not self.performer:
@@ -76,7 +76,17 @@ class CueSheet():
                         self.tracks[current_track_name].track_start_index = \
                         self.eval_line(
                             self.execution_plan["track_start_index"], line)   
-                                            
+    
+    def add_ending_time(self):
+        prev_track = None
+        for track in self.tracks.values():
+            if track.track_number == "TRACK 00":
+                prev_track = track
+                continue
+            prev_track.track_end_index = track.track_start_index
+            prev_track = track
+            
+                                     
 class CueTrack():
 
     def __init__(self):
@@ -85,4 +95,7 @@ class CueTrack():
         self.track_file_name = None
         self.track_title = None
         self.track_start_index = None  
+        self.track_end_index = None  
+        
+
     
