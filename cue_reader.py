@@ -16,7 +16,8 @@ class CueSheet():
             "title": '^TITLE .(.*)\"\s',                                     
             "file": 'FILE .(.*)\"\s',          
             # track
-            "track_beginning": '\t(TRACK.*) AUDIO\s',
+            "track_beginning": '\tTRACK.(\d*) AUDIO\s',            
+            # "track_beginning": '\tTRACK.(*) AUDIO\s',
             "track_performer": '\s{2}PERFORMER .(.*)\"\s', 
             "track_file_name": '\s{2}REM .(.*)\"\s',                                     
             "track_title": '\s{2}TITLE .(.*)\"\s',
@@ -57,8 +58,10 @@ class CueSheet():
                     current_track_name , self.tracks[current_track_name] = \
                         self.eval_line(
                             self.execution_plan["track_beginning"], line)
+                    self.tracks[current_track_name].track_enumeration = \
+                        f"TRACK {current_track_name}"
                     self.tracks[current_track_name].track_number = \
-                        current_track_name
+                        int(current_track_name) + 1                      
                 if current_track_name:
                     if not self.tracks[current_track_name].track_performer:
                         self.tracks[current_track_name].track_performer = \
@@ -80,7 +83,7 @@ class CueSheet():
     def add_ending_time(self):
         prev_track = None
         for track in self.tracks.values():
-            if track.track_number == "TRACK 00":
+            if track.track_enumeration == "TRACK 00":
                 prev_track = track
                 continue
             prev_track.track_end_index = track.track_start_index
@@ -91,6 +94,7 @@ class CueTrack():
 
     def __init__(self):
         self.track_number = None
+        self.track_enumeration = None
         self.track_performer = None
         self.track_file_name = None
         self.track_title = None

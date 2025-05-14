@@ -15,7 +15,8 @@ def start():
     cue_sheet.sheet_reader_liner()
     cue_sheet.add_ending_time()
     audio_cutter = AudioCutter()
-    audio_cutter.cut_audio_tracks(list(cue_sheet.tracks.values()))
+    # audio_cutter.cut_audio_tracks_pydub(list(cue_sheet.tracks.values()))
+    audio_cutter.cut_audio_tracks_ffmpeg(list(cue_sheet.tracks.values()))
     # album = AudioSegment.from_file("szczelina.mp3", "mp3")
     pass
 
