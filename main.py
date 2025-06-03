@@ -1,38 +1,46 @@
-from portability import resource_path
+import os
+import sys
 import pathlib
+from dotenv import load_dotenv, find_dotenv 
+
+
+from portability import resource_path
+
+
 from cue_reader import CueSheet
 from audio_cutter import AudioCutter
+from audio_sender import SFTPClient
 
 
 from loggingSettings import logger_wrapper, logger_initialization
-from pydub import AudioSegment
+
+local_file_path = '/home/jakub/Documents/PythonScripts/AudioCutter/.test_files/expected_files/'
+remote_file_path = 'Audiobooks/'
 
 
-def start():
-  #  AudioSegment.converter = "/usr/bin/snap/"
-    
-    cue_sheet = CueSheet()
-    cue_sheet.sheet_reader_liner()
-    cue_sheet.add_ending_time()
-    audio_cutter = AudioCutter()
-    # audio_cutter.cut_audio_tracks_pydub(list(cue_sheet.tracks.values()))
-    audio_cutter.cut_audio_tracks_ffmpeg(list(cue_sheet.tracks.values()))
-    # album = AudioSegment.from_file("szczelina.mp3", "mp3")
-    pass
+load_dotenv()
+
 
 
 def main():
-    logger = logger_initialization("pydub.converter")   
-    # logger = logging.getLogger("pydub.converter")
-    # logger.setLevel(logging.INFO)
-    # formatter = logging.Formatter(
-    #     '%(levelname)s: %(asctime)s: %(process)s: %(funcName)s: %(message)s')
 
-    # stream_handler = logging.StreamHandler()
-    # file_handler = logging.FileHandler('logfile.log')
-    # file_handler.setFormatter(formatter)
-    # logger.addHandler(stream_handler)
-    start()
+
+    logger = logger_initialization("ffmpeg.converter")   
+    cue_sheet = CueSheet()
+    cue_sheet.sheet_reader_liner()
+    cue_sheet.add_ending_time()
+    # audio_cutter = AudioCutter()
+    # audio_cutter.cut_audio_tracks_ffmpeg(list(cue_sheet.tracks.values()))
+
+    sftmp_client = SFTPClient(os.environ.get("HOST_IP"), 
+                              os.environ.get('PORT'),
+                              os.environ.get('REMOTE_USER'),
+                              os.environ.get('PASSWORD'))
+    sftmp_client.ssh_connect()
+    
+    sftmp_client.ssh_upload_album(list(cue_sheet.tracks.values()), local_file_path, remote_file_path, cue_sheet.title)
+    
+    sftmp_client.ssh_disconnect()
 
 
 if __name__ == "__main__":
