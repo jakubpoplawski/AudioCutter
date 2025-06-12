@@ -1,0 +1,19 @@
+PERFORMER "John Doe"
+TITLE "Book"
+FILE "book.mp3" MP3
+REM sdSDODWDKOODK565dfdWEWED0=
+	TRACK 00 AUDIO
+		PERFORMER "Jane Doe"
+		REM "0000 - book.mp3" 0
+		TITLE "Start"
+		INDEX 01 00:00:00
+	TRACK 01 AUDIO
+		PERFORMER "Jane Doe"
+		REM "0001 - book.mp3" 9561
+		TITLE "Dedication"
+		INDEX 01 00:09:42
+	TRACK 02 AUDIO
+		PERFORMER "Jane Doe"
+		REM "0002 - book.mp3" 19331
+		TITLE "Prologue"
+		INDEX 01 00:19:24

@@ -5,7 +5,7 @@ from portability import resource_path
 def logger_initialization(log_name):
     global logger
 
-    logger = logging.getLogger("pydub.converter")
+    logger = logging.getLogger("ffmpeg.converter")
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         '%(levelname)s: %(asctime)s: %(process)s: %(funcName)s: %(message)s')
@@ -20,11 +20,13 @@ def logger_initialization(log_name):
 
 def logger_wrapper(func):
     def log_wrapper(*args):
-        logger.info(f'{func.__name__} Section started.')
+        logger.info(f'{func.__name__} section started with arguments: {args}.')
         try:
             result = func(*args)
         except Exception as e:
             logger.error(e)
-        logger.info('Section ended.')
+            logger.info(f'{func.__name__} section ended with an error.')
+            return None
+        logger.info(f'{func.__name__} section ended.')
         return result
     return log_wrapper

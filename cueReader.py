@@ -1,11 +1,17 @@
-from portability import resource_path
 import pathlib
 import re
+
+from loggingSettings import logger_wrapper
+from portability import resource_path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CueSheet():
     
-    def __init__(self):
+    def __init__(self, file_location):
+        self.file_location = pathlib.Path(resource_path(file_location))
         self.performer = None
         self.title = None
         self.album_file_name = None
@@ -25,24 +31,23 @@ class CueSheet():
         }
 
  
-                    
+    @logger_wrapper              
     def eval_line(self, regex_pattern, input_line):
         try:
             match = re.match(regex_pattern, input_line)
             if regex_pattern == self.execution_plan["track_beginning"]:
-                current_track_name = match.groups(0)[0]
-                self.tracks[current_track_name] = CueTrack()
-                return current_track_name, self.tracks[current_track_name]                
+                current_track_number = match.groups(0)[0]
+                self.tracks[current_track_number] = CueTrack()
+                return current_track_number, self.tracks[current_track_number]                
             return match.groups(0)[0]
-        except AttributeError:
-            pass  
+        except AttributeError as e:
+            pass
+
   
-  
+    @logger_wrapper  
     def sheet_reader_liner(self):
         current_track_name = None  
-        with open(pathlib.Path(
-            resource_path('.test_files/source_files/skaza.cue'))) \
-                as cue_file:
+        with open(self.file_location) as cue_file:
             for line in cue_file:
                 if not self.performer:
                     self.performer = self.eval_line(
@@ -53,15 +58,16 @@ class CueSheet():
                 if not self.album_file_name:
                     self.album_file_name = self.eval_line(
                         self.execution_plan["file"], line)
-                    
+
                 if re.match(self.execution_plan["track_beginning"], line):
-                    current_track_name , self.tracks[current_track_name] = \
+                    current_track_name, self.tracks[current_track_name] = \
                         self.eval_line(
                             self.execution_plan["track_beginning"], line)
                     self.tracks[current_track_name].track_enumeration = \
                         f"TRACK {current_track_name}"
                     self.tracks[current_track_name].track_number = \
-                        int(current_track_name) + 1                      
+                        int(current_track_name) + 1  
+                                            
                 if current_track_name:
                     if not self.tracks[current_track_name].track_performer:
                         self.tracks[current_track_name].track_performer = \
@@ -78,8 +84,9 @@ class CueSheet():
                     if not self.tracks[current_track_name].track_start_index:
                         self.tracks[current_track_name].track_start_index = \
                         self.eval_line(
-                            self.execution_plan["track_start_index"], line)   
-    
+                            self.execution_plan["track_start_index"], line)
+
+    @logger_wrapper   
     def add_ending_time(self):
         prev_track = None
         for track in self.tracks.values():
@@ -88,6 +95,7 @@ class CueSheet():
                 continue
             prev_track.track_end_index = track.track_start_index
             prev_track = track
+
             
                                      
 class CueTrack():
