@@ -27,7 +27,7 @@ class CueSheet():
             "track_performer": '\s{2}PERFORMER .(.*)\"\s', 
             "track_file_name": '\s{2}REM .(.*)\"\s',                                     
             "track_title": '\s{2}TITLE .(.*)\"\s',
-            "track_start_index": '\s{2}INDEX 01 (\d{1,}\:\d{2}\:\d{2})\s'                                            
+            "track_start_index": '\s{2}INDEX 01 (\d{1,}\:\d{2}\:\d{2})\s?'                                            
         }
 
  

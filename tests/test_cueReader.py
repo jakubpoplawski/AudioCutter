@@ -13,22 +13,10 @@ from cueReader import CueSheet, CueTrack
 
 class test_CueSheet(unittest.TestCase):
     
-    # def mock_decorator(*args, **kwargs):
-    #     """Decorate by doing nothing."""
-    #     def decorator(f):
-    #         @wraps(f)
-    #         def decorated_function(*args, **kwargs):
-    #             return f(*args, **kwargs)
-    #         return decorated_function
-    #     return decorator
 
-    #@classmethod
     def setUp(self):
-        #patch('loggingSettings.logger_wrapper', test_CueSheet.mock_decorator).start()
-        
         self.test_cuesheet = CueSheet('./tests/dummy_cue.cue')
          
-    #@classmethod
     def tearDown(self):
         del self.test_cuesheet   
     
@@ -39,7 +27,6 @@ class test_CueSheet(unittest.TestCase):
         self.assertTrue(hasattr(self.test_cuesheet, 'tracks'))    
         self.assertTrue(hasattr(self.test_cuesheet, 'execution_plan'))  
     
-    # @patch('info')
     def test_eval_line(self):
         dummy_performer_line = 'PERFORMER "John Doe"\n'
         tested_performer_line = self.test_cuesheet.execution_plan['performer']
@@ -68,5 +55,54 @@ class test_CueSheet(unittest.TestCase):
             album_track_beggining_regex, 
             dummy_track_beggining_line)[1], 
             CueTrack)
+
+
+    def test_sheet_reader_liner(self): 
+        self.test_cuesheet.sheet_reader_liner()
+        self.assertEqual(self.test_cuesheet.performer, "John Doe")
+        self.assertEqual(self.test_cuesheet.title, "Book")
+        self.assertEqual(self.test_cuesheet.album_file_name, "book.mp3")
+  
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_number, 1)   
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_enumeration, 'TRACK 00') 
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_performer, 'Jane Doe')  
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_file_name, '0000 - book.mp3')   
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_title, 'Start') 
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_start_index, '00:00:00') 
+        self.assertEqual(self.test_cuesheet.tracks['00'].track_end_index, None) 
+                            
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_number, 2)   
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_enumeration, 'TRACK 01') 
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_performer, 'Jane Doe')  
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_file_name, '0001 - book.mp3')   
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_title, 'Dedication') 
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_start_index, '00:09:42') 
+        self.assertEqual(self.test_cuesheet.tracks['01'].track_end_index, None) 
+
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_number, 3)   
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_enumeration, 'TRACK 02') 
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_performer, 'Jane Doe')  
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_file_name, '0002 - book.mp3')   
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_title, 'Prologue') 
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_start_index, '00:19:24') 
+        self.assertEqual(self.test_cuesheet.tracks['02'].track_end_index, None) 
+
+
+class test_CueTrack(unittest.TestCase):
     
+
+    def setUp(self):
+        self.test_cuetrack = CueTrack()
+         
+    #@classmethod
+    def tearDown(self):
+        del self.test_cuetrack   
     
+    def test_cuesheet_attributes(self):
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_number'))
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_enumeration'))    
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_performer'))    
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_file_name'))    
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_title'))  
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_start_index'))    
+        self.assertTrue(hasattr(self.test_cuetrack, 'track_end_index'))  
