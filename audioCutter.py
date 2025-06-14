@@ -14,13 +14,19 @@ class AudioCutter():
 
     @logger_wrapper
     def time_to_miliseconds(self, input_time):
-        temp_time = list(map(int, input_time.split(":")))
+        try:
+            temp_time = list(map(int, input_time.split(":")))
+        except ValueError as e:
+            raise e
         # CUE time is in MM:SS:FF format
         return temp_time[0] * 60 * 1000 + temp_time[1] * 1000 + temp_time[2] * (4 / 3)
 
     @logger_wrapper
     def time_to_seconds(self, input_time):
-        temp_time = list(map(int, input_time.split(":")))
+        try:
+            temp_time = list(map(int, input_time.split(":")))
+        except ValueError as e:
+            raise e
         # CUE time is in MM:SS:FF format - 75 frames in 1 second
         return temp_time[0] * 60 + temp_time[1] + temp_time[2] / 75
 
