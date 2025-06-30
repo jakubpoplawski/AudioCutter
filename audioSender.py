@@ -24,7 +24,8 @@ class SFTPClient():
                                 username=self.user, 
                                 password=self.password,
                                 look_for_keys=True,
-                                port=self.port)
+                                port=self.port,
+                                timeout=3)
             
     @logger_wrapper
     def ssh_scan_connect(self):

@@ -27769,3 +27769,4 @@ INFO: 2025-06-13 00:10:22,934: 15385: log_wrapper: eval_line section ended.
 INFO: 2025-06-13 00:10:22,934: 15385: log_wrapper: sheet_reader_liner section ended.
 INFO: 2025-06-13 00:10:57,321: 15385: log_wrapper: add_ending_time section started with arguments: (<cueReader.CueSheet object at 0x7c4b97fc85f0>,).
 INFO: 2025-06-13 00:10:57,321: 15385: log_wrapper: add_ending_time section ended.
+INFO: 2025-06-24 11:33:48,904: 8736: main: Extracting data from cue sheet file.

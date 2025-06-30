@@ -12,7 +12,8 @@ class IPScanner():
     
     @logger_wrapper   
     def scan_ips(self):
-        command = f"nmap -sT -p {self.port} {self.ip_range} | grep -oP '{self.regex_ip_filter}'"
+        command = f"nmap -sT -p {self.port} "\
+            f"{self.ip_range} | grep -oP '{self.regex_ip_filter}'"
 
         command_result = check_output((command), shell=True).decode()
         
