@@ -31,48 +31,60 @@ class SFTPClient():
     def ssh_scan_connect(self):
         for ip in self.ip_list:
             self.host_ip = ip
-            with suppress(paramiko.ssh_exception.NoValidConnectionsError):
-                try:
-                    self.ssh_connect()
-                    print(f"Connected to {self.host_ip}:{self.port} as {self.user}.")
-                    break
-                except Exception as e:
+            # with suppress(paramiko.ssh_exception.NoValidConnectionsError):
+            #     try:
+            #         self.ssh_connect()
+            #         print(f"Connected to {self.host_ip}:{self.port} as {self.user}.")
+            #         break
+            #     except TimeoutError as e:
+            #         continue
+            #     except Exception as e:
+            #         raise e
+            try:
+                self.ssh_connect()
+                break
+            except TimeoutError as e:
+                if ip == self.ip_list[-1]:
                     raise e
+                continue
 
     @logger_wrapper         
     def ssh_disconnect(self):
         self.SSH_Client.close()
-        print(f"{self.user} is disconnected from {self.host_ip}:{self.port}")  
+        print(f"{self.user} is disconnected \
+            from {self.host_ip}:{self.port}")  
 
     @logger_wrapper
     def ssh_create_directory(self, remote_album_path, mode=770):
         sftp_client = self.SSH_Client.open_sftp()
-        if sftp_client.stat(remote_album_path):
+        try:
+            sftp_client.stat(remote_album_path)
             pass
-        else:
-            try:        
-                sftp_client.mkdir(remote_album_path, mode)
-            except IOError as e:
-                raise e
+        except IOError as e:
+            sftp_client.mkdir(remote_album_path, mode)
 
     @logger_wrapper
     def ssh_upload_file(self, local_track_path, remote_track_path):          
         sftp_client = self.SSH_Client.open_sftp()
         try:
             sftp_client.stat(remote_track_path)
-        except FileNotFoundError:  
+            pass
+        except FileNotFoundError as e:  
             try:      
                 sftp_client.put(local_track_path, remote_track_path)
-            except FileNotFoundError:
-                print(f"File {local_track_path} was not found on the local system")
+            except FileNotFoundError as e:
+                raise e
 
     @logger_wrapper
-    def ssh_upload_album(self, track_list, local_album_path, remote_path, album_name):
+    def ssh_upload_album(self, track_list, local_album_path, 
+                         remote_path, album_name):
         remote_album_path = remote_path + album_name.lower() + "/"
         self.ssh_create_directory(remote_album_path)
         for i in range(len(track_list)):
-            local_track_path = local_album_path + track_list[i].track_file_name
-            remote_track_path = remote_album_path + track_list[i].track_file_name
+            local_track_path = local_album_path +\
+                track_list[i].track_file_name
+            remote_track_path = remote_album_path +\
+                track_list[i].track_file_name
             self.ssh_upload_file(local_track_path, remote_track_path)
             
 
