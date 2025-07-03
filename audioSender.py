@@ -1,5 +1,5 @@
-from contextlib import suppress
 import paramiko
+import paramiko.ssh_exception
 
 from loggingSettings import logger_wrapper
 
@@ -24,8 +24,8 @@ class SFTPClient():
                                 username=self.user, 
                                 password=self.password,
                                 look_for_keys=True,
-                                port=self.port,
-                                timeout=3)
+                                port=self.port)
+                                
             
     @logger_wrapper
     def ssh_scan_connect(self):
@@ -43,7 +43,7 @@ class SFTPClient():
             try:
                 self.ssh_connect()
                 break
-            except TimeoutError as e:
+            except paramiko.ssh_exception.NoValidConnectionsError as e:
                 if ip == self.ip_list[-1]:
                     raise e
                 continue
@@ -69,11 +69,10 @@ class SFTPClient():
         try:
             sftp_client.stat(remote_track_path)
             pass
-        except FileNotFoundError as e:  
-            try:      
-                sftp_client.put(local_track_path, remote_track_path)
-            except FileNotFoundError as e:
-                raise e
+        except IOError as e:
+            sftp_client.put(local_track_path, remote_track_path)
+
+
 
     @logger_wrapper
     def ssh_upload_album(self, track_list, local_album_path, 
@@ -81,9 +80,9 @@ class SFTPClient():
         remote_album_path = remote_path + album_name.lower() + "/"
         self.ssh_create_directory(remote_album_path)
         for i in range(len(track_list)):
-            local_track_path = local_album_path +\
+            local_track_path = str(local_album_path) + "/" +\
                 track_list[i].track_file_name
-            remote_track_path = remote_album_path +\
+            remote_track_path = str(remote_album_path) +\
                 track_list[i].track_file_name
             self.ssh_upload_file(local_track_path, remote_track_path)
             

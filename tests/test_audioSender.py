@@ -1,14 +1,7 @@
 import unittest
+from unittest.mock import patch, MagicMock, mock_open
 
 import paramiko
-
-from paramiko import SSHClient
-import subprocess, sys
-
-from functools import wraps
-import io
-
-from unittest.mock import patch, MagicMock, Mock, mock_open
 
 patch('loggingSettings.logger_wrapper', lambda x: x).start()
 
@@ -52,48 +45,60 @@ class test_SFTPClient(unittest.TestCase):
         self.test_SFTPClient.ssh_connect()  
         mock_SSHClient.connect.assert_called_with(
             '000.000.0.101', username='blah', password='blahpass', 
-            look_for_keys=True, port='0000', timeout=3)
+            look_for_keys=True, port='0000')
         
     def test_ssh_scan_connect_good(self):
         mock_SSHClient = self.test_SFTPClient.SSH_Client
-   
-               
-        mock_SSHClient.connect = MagicMock(return_value=True, 
-                                           side_effect=[TimeoutError, 
-                                                        True])
         
+        errors = {'000.000.0.101': ('000.000.0.101', '0000')}
+        error_effect = \
+            paramiko.ssh_exception.NoValidConnectionsError(errors)            
+        
+        mock_SSHClient.connect = MagicMock(return_value=True, 
+                                           side_effect=[error_effect, 
+                                                        True])
+
         self.test_SFTPClient.ssh_scan_connect()  
+            
         mock_SSHClient.connect.assert_any_call(
             '000.000.0.101', username='blah', password='blahpass', 
-            look_for_keys=True, port='0000', timeout=3)
+            look_for_keys=True, port='0000')
         mock_SSHClient.connect.assert_any_call(
             '000.000.0.102', username='blah', password='blahpass', 
-            look_for_keys=True, port='0000', timeout=3) 
+            look_for_keys=True, port='0000') 
         
     def test_ssh_scan_connect_bad(self):
         mock_SSHClient = self.test_SFTPClient.SSH_Client
-   
-               
+        
+        errors = {'000.000.0.101': ('000.000.0.101', '0000'),
+                  '000.000.0.102': ('000.000.0.102', '0000'),}
+        error_effect = \
+            paramiko.ssh_exception.NoValidConnectionsError(errors)         
+        
         mock_SSHClient.connect = MagicMock(return_value=True, 
-                                           side_effect=[TimeoutError, 
-                                                        TimeoutError])
+                                           side_effect=[error_effect, 
+                                                        error_effect])
 
-        with self.assertRaises(TimeoutError):
+        with self.assertRaises(
+            paramiko.ssh_exception.NoValidConnectionsError):
             self.test_SFTPClient.ssh_scan_connect()  
          
         mock_SSHClient.connect.assert_any_call(
             '000.000.0.101', username='blah', password='blahpass', 
-            look_for_keys=True, port='0000', timeout=3)
+            look_for_keys=True, port='0000')
         mock_SSHClient.connect.assert_any_call(
             '000.000.0.102', username='blah', password='blahpass', 
-            look_for_keys=True, port='0000', timeout=3)  
+            look_for_keys=True, port='0000')  
     
     def test_ssh_disconnect(self):
         mock_SSHClient = self.test_SFTPClient.SSH_Client
-   
+        
+        errors = {'000.000.0.101': ('000.000.0.101', '0000')}
+        error_effect = \
+            paramiko.ssh_exception.NoValidConnectionsError(errors) 
                
         mock_SSHClient.connect = MagicMock(return_value=True, 
-                                           side_effect=[TimeoutError, 
+                                           side_effect=[error_effect, 
                                                         True])
                
         mock_SSHClient.close = MagicMock()
@@ -199,7 +204,7 @@ class test_SFTPClient_ssh_upload_album(unittest.TestCase):
         
         test_track_list = list(self.test_cuesheet.tracks.values())
         self.test_SFTPClient.ssh_upload_album(test_track_list, 
-                                            'Documents/',
+                                            'Documents',
                                             'Audiobooks/',
                                             'the_book') 
         

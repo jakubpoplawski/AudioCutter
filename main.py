@@ -1,24 +1,17 @@
 import os
-import sys
 import pathlib
-from dotenv import load_dotenv, find_dotenv 
-
-import paramiko
-from portability import resource_path
-
+from dotenv import load_dotenv 
 
 from cueReader import CueSheet
 from audioCutter import AudioCutter
 from ipScanner import IPScanner
 from audioSender import SFTPClient
 
-from subprocess import check_output
-
-
-from loggingSettings import logger_wrapper, logger_initialization
+from portability import resource_path
+from loggingSettings import logger_initialization
 
 local_file_path = pathlib.Path(resource_path('.test_files/expected_files/'))
-remote_file_path = pathlib.Path(resource_path('Audiobooks/'))
+remote_file_path = 'Audiobooks/'
 
 
 load_dotenv()
@@ -36,10 +29,12 @@ def main():
     cue_sheet.sheet_reader_liner()
     cue_sheet.add_ending_time()
 
-    logger.info('Cutting audio file with accordance to the cue sheet file.')
+    logger.info('Cutting audio file according to the cue sheet file.')
     
-    # audio_cutter = AudioCutter('.test_files/source_files/skaza.mp3', '.test_files/expected_files/')
-    # audio_cutter.cut_audio_tracks_ffmpeg(list(cue_sheet.tracks.values()))
+    audio_cutter = AudioCutter('.test_files/source_files/skaza.mp3', 
+                               '.test_files/expected_files/')
+    audio_cutter.cut_audio_tracks_ffmpeg(
+        list(cue_sheet.tracks.values()))
     
     logger.info('Scanning wi-fi network for available local addresses.')
     
@@ -62,7 +57,10 @@ def main():
 
     logger.info('Uploading data to the connected device.')
  
-    # sftmp_client.ssh_upload_album(list(cue_sheet.tracks.values()), local_file_path, remote_file_path, cue_sheet.title)
+    sftmp_client.ssh_upload_album(list(cue_sheet.tracks.values()), 
+                                  local_file_path, 
+                                  remote_file_path, 
+                                  cue_sheet.title)
 
     logger.info('Disconnecting from the device.')
     

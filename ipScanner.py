@@ -17,5 +17,6 @@ class IPScanner():
 
         command_result = check_output((command), shell=True).decode()
         
-        return list(filter(lambda i: i != '', command_result.split('\n')))
+        return list(filter(lambda i: i != '', 
+                           command_result.split('\n')))
         
