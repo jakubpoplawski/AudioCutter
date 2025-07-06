@@ -1,6 +1,9 @@
 from subprocess import check_output
+import logging
 
 from loggingSettings import logger_wrapper
+
+logger = logging.getLogger(__name__)
 
 class IPScanner():
     

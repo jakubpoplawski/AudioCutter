@@ -1,12 +1,11 @@
 import pathlib
 import re
+import logging
 
 from loggingSettings import logger_wrapper
 from portability import resource_path
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 class CueSheet():
     

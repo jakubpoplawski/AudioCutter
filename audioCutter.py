@@ -1,8 +1,11 @@
 import ffmpeg
 import pathlib
+import logging
 
 from portability import resource_path
 from loggingSettings import logger_wrapper
+
+logger = logging.getLogger(__name__)
 
 class AudioCutter():
     def __init__(self, source_path, output_path):
@@ -33,26 +36,34 @@ class AudioCutter():
     def cut_audio_tracks_ffmpeg(self, track_list):
         track_list_length = len(track_list)
         for i in range(track_list_length):
-            metadata_list = [f"title={track_list[i].track_title}",
-                             f"artist={track_list[i].track_performer}", 
-            f"track={track_list[i].track_number}/{track_list_length}"]
-            metadata_dict = {f"metadata:g:{i}": e for i, e in enumerate(
-                metadata_list)}
-            
-            fragment_start_index = self.time_to_seconds(
-                track_list[i].track_start_index)
-            
-            if i == len(track_list)-1:
-                audio_input = ffmpeg.input(self.source_path, 
-                                           ss=fragment_start_index)        
+            track_path = \
+                f"{self.output_path}/{track_list[i].track_file_name}"
+            if pathlib.Path(track_path).is_file():
+                logger.info(f"File {track_list[i].track_file_name} \
+                    already exists.")
             else:
-                fragment_end_index = self.time_to_seconds(
-                    track_list[i].track_end_index)
-                audio_input = ffmpeg.input(self.source_path, 
+                metadata_list = \
+                    [f"title={track_list[i].track_title}",
+                    f"artist={track_list[i].track_performer}", 
+                f"track=\
+                    {track_list[i].track_number}/{track_list_length}"]
+                metadata_dict = \
+                    {f"metadata:g:{i}": e for i, e in enumerate(
+                    metadata_list)}
+                
+                fragment_start_index = self.time_to_seconds(
+                    track_list[i].track_start_index)
+                
+                if i == len(track_list)-1:
+                    audio_input = ffmpeg.input(self.source_path, 
+                                            ss=fragment_start_index)        
+                else:
+                    fragment_end_index = self.time_to_seconds(
+                        track_list[i].track_end_index)
+                    audio_input = ffmpeg.input(self.source_path, 
                             ss=fragment_start_index, 
                             t=fragment_end_index-fragment_start_index)
-            audio_output = ffmpeg.output(audio_input, 
-                f"{self.output_path}/{track_list[i].track_file_name}", 
-                acodec="copy", **metadata_dict)
-            
-            audio_output.run()
+                audio_output = ffmpeg.output(audio_input, track_path, 
+                    acodec="copy", **metadata_dict)
+                
+                audio_output.run()

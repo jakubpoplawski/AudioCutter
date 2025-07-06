@@ -1,7 +1,10 @@
 import paramiko
 import paramiko.ssh_exception
+import logging
 
 from loggingSettings import logger_wrapper
+
+logger = logging.getLogger(__name__)
 
 class SFTPClient():
     
