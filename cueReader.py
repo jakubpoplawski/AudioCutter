@@ -20,9 +20,9 @@ class CueSheet():
             "performer": '^PERFORMER .(.*)\"\s', 
             "title": '^TITLE .(.*)\"\s',                                     
             "file": 'FILE .(.*)\"\s',          
-            # track
+            # track header
             "track_beginning": '\tTRACK.(\d*) AUDIO\s',            
-            # "track_beginning": '\tTRACK.(*) AUDIO\s',
+            # track
             "track_performer": '\s{2}PERFORMER .(.*)\"\s', 
             "track_file_name": '\s{2}REM .(.*)\"\s',                                     
             "track_title": '\s{2}TITLE .(.*)\"\s',
@@ -37,7 +37,8 @@ class CueSheet():
             if regex_pattern == self.execution_plan["track_beginning"]:
                 current_track_number = match.groups(0)[0]
                 self.tracks[current_track_number] = CueTrack()
-                return current_track_number, self.tracks[current_track_number]                
+                return current_track_number, \
+                       self.tracks[current_track_number]                
             return match.groups(0)[0]
         except AttributeError as e:
             pass

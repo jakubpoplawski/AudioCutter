@@ -1,6 +1,7 @@
 import paramiko
 import paramiko.ssh_exception
 import logging
+import re
 
 from loggingSettings import logger_wrapper
 
@@ -79,7 +80,8 @@ class SFTPClient():
 
     @logger_wrapper
     def ssh_upload_album(self, track_list, local_album_path, 
-                         remote_path, album_name):
+                         remote_path, album_name, 
+                         local_artwork_path=None):
         remote_album_path = remote_path + album_name.lower() + "/"
         self.ssh_create_directory(remote_album_path)
         for i in range(len(track_list)):
@@ -88,6 +90,13 @@ class SFTPClient():
             remote_track_path = str(remote_album_path) +\
                 track_list[i].track_file_name
             self.ssh_upload_file(local_track_path, remote_track_path)
+        if local_artwork_path != None:
+            artwork_name = re.search(r'[0-9a-zA-Z-]+\.[a-zA-Z-]{2,4}', 
+                                     local_artwork_path)
+            remote_artwork_path = remote_album_path + \
+                                artwork_name.group(0)
+            self.ssh_upload_file(local_artwork_path, 
+                                 remote_artwork_path)            
             
 
 

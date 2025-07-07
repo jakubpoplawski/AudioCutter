@@ -46,7 +46,7 @@ class test_audioCutter(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.test_audiocutter.time_to_seconds("00:MM:42")
 
-    def test_cut_audio_tracks_ffmpeg(self):
+    def test_cut_audio_tracks_ffmpeg_no_artwork(self):
             ffmpeg_mock = ffmpeg
             ffmpeg_mock.input = MagicMock(return_value='InputMock')
             ffmpeg_mock.output = MagicMock()
@@ -61,7 +61,7 @@ class test_audioCutter(unittest.TestCase):
             ffmpeg_mock.output.assert_any_call('InputMock', 
                 '/home/jakub/Documents/PythonScripts/'\
                 'AudioCutter/tests/dummy_outputs/0000 - book.mp3', 
-                acodec='copy',
+                id3v2_version=3, acodec='copy',
                 **expected_metadata_01)     
             
             expected_metadata_02 = {'metadata:g:0':'title=Dedication', 
@@ -70,14 +70,25 @@ class test_audioCutter(unittest.TestCase):
             ffmpeg_mock.output.assert_any_call('InputMock', 
                 '/home/jakub/Documents/PythonScripts/'\
                 'AudioCutter/tests/dummy_outputs/0001 - book.mp3', 
-                acodec='copy',
+                id3v2_version=3, acodec='copy',
                 **expected_metadata_02)        
             
             expected_metadata_03 = {'metadata:g:0':'title=Prologue', 
                                     'metadata:g:1':'artist=Jane Doe', 
                                     'metadata:g:2':'track=3/3'}
-            ffmpeg_mock.output.assert_any_call('InputMock', 
+            ffmpeg_mock.output.assert_called_with('InputMock', 
                 '/home/jakub/Documents/PythonScripts/'\
                 'AudioCutter/tests/dummy_outputs/0002 - book.mp3', 
-                acodec='copy',
+                id3v2_version=3, acodec='copy',
                 **expected_metadata_03) 
+
+        # ADD TESTCASE WITH ARTWORK
+    def test_cut_audio_tracks_ffmpeg_with_artwork(self):
+            ffmpeg_mock = ffmpeg
+            ffmpeg_mock.input = MagicMock(return_value='InputMock')
+            ffmpeg_mock.output = MagicMock()
+            ffmpeg_mock.output.run = MagicMock(return_value=True)                  
+            self.test_audiocutter.cut_audio_tracks_ffmpeg(
+                    list(self.test_cuesheet.tracks.values()))     
+            ffmpeg_mock.input.assert_called()       
+            ffmpeg_mock.input.assert_not_called()

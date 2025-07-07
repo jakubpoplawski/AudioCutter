@@ -33,7 +33,8 @@ class AudioCutter():
         return temp_time[0] * 60 + temp_time[1] + temp_time[2] / 75
 
     @logger_wrapper         
-    def cut_audio_tracks_ffmpeg(self, track_list):
+    def cut_audio_tracks_ffmpeg(self, track_list, 
+                                artwork_file_path=None):
         track_list_length = len(track_list)
         for i in range(track_list_length):
             track_path = \
@@ -45,11 +46,15 @@ class AudioCutter():
                 metadata_list = \
                     [f"title={track_list[i].track_title}",
                     f"artist={track_list[i].track_performer}", 
-                f"track=\
-                    {track_list[i].track_number}/{track_list_length}"]
+                "track=" \
+                f"{track_list[i].track_number}/{track_list_length}"]
                 metadata_dict = \
                     {f"metadata:g:{i}": e for i, e in enumerate(
                     metadata_list)}
+                
+                if artwork_file_path != None:
+                    metadata_dict['metadata:s:v'] = \
+                        f'file={artwork_file_path}'
                 
                 fragment_start_index = self.time_to_seconds(
                     track_list[i].track_start_index)
@@ -64,6 +69,6 @@ class AudioCutter():
                             ss=fragment_start_index, 
                             t=fragment_end_index-fragment_start_index)
                 audio_output = ffmpeg.output(audio_input, track_path, 
-                    acodec="copy", **metadata_dict)
+                    id3v2_version=3, acodec="copy", **metadata_dict)
                 
                 audio_output.run()

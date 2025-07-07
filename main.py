@@ -18,8 +18,16 @@ from loggingSettings import logger_initialization
 # local_cut_files_path = '.test_files/expected_files/'
 # remote_file_path = 'Audiobooks/'
 
-# sys.argv = ['main.py', '-f='+local_file_path,'-s='+local_cue_sheet_path, 
-#             '-c='+str(local_cut_files_path), '-r='+remote_file_path]
+local_file_path = '/home/jakub/Documents/dom/dom-na-wyrebach.mp3'
+local_cue_sheet_path = '/home/jakub/Documents/dom/dom-na-wyrebach.cue'
+local_artwork_path = '/home/jakub/Documents/dom/dom-na-wyrebach.jpeg'
+local_cut_files_path = '/home/jakub/Documents/dom/cut_files/'
+remote_file_path = 'Audiobooks/'
+
+
+sys.argv = ['main.py', '-f='+local_file_path,'-s='+local_cue_sheet_path,
+            '-a='+local_artwork_path, '-c='+str(local_cut_files_path), 
+            '-r='+remote_file_path]
 
 
 load_dotenv()
@@ -42,6 +50,9 @@ def main():
     parser.add_argument('-s','--sheet', 
                         help='Path to the cue sheet file', 
                         required=True)
+    parser.add_argument('-a','--artwork', 
+                        help='Path to the artwork file', 
+                        required=False)   
     parser.add_argument('-c','--cut', 
                         help='Path to store cut mp3s locally', 
                         required=True)
@@ -53,6 +64,7 @@ def main():
 
     local_file_path = args.file
     local_cue_sheet_path = args.sheet
+    local_artwork_path = args.artwork
     local_cut_files_path = pathlib.Path(resource_path(args.cut))
     remote_file_path = args.remote
     
@@ -81,7 +93,7 @@ def main():
     
     audio_cutter = AudioCutter(local_file_path, local_cut_files_path)
     audio_cutter.cut_audio_tracks_ffmpeg(
-        list(cue_sheet.tracks.values()))
+        list(cue_sheet.tracks.values()), local_artwork_path)
     
     logger.info('Scanning wi-fi network for available local addresses.')
     
@@ -107,7 +119,8 @@ def main():
     sftmp_client.ssh_upload_album(list(cue_sheet.tracks.values()), 
                                   local_cut_files_path, 
                                   remote_file_path, 
-                                  cue_sheet.title)
+                                  cue_sheet.title,
+                                  local_artwork_path)
 
     logger.info('Disconnecting from the device.')
     
