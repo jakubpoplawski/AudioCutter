@@ -1,6 +1,6 @@
 import unittest
 import ffmpeg
-
+import pathlib
 
 from unittest.mock import patch, MagicMock, mock_open
 
@@ -59,8 +59,8 @@ class test_audioCutter(unittest.TestCase):
                                     'metadata:g:1':'artist=Jane Doe', 
                                     'metadata:g:2':'track=1/3'}
             ffmpeg_mock.output.assert_any_call('InputMock', 
-                '/home/jakub/Documents/PythonScripts/'\
-                'AudioCutter/tests/dummy_outputs/0000 - book.mp3', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0000 - book.mp3').absolute()), 
                 id3v2_version=3, acodec='copy',
                 **expected_metadata_01)     
             
@@ -68,27 +68,58 @@ class test_audioCutter(unittest.TestCase):
                                     'metadata:g:1':'artist=Jane Doe', 
                                     'metadata:g:2':'track=2/3'}
             ffmpeg_mock.output.assert_any_call('InputMock', 
-                '/home/jakub/Documents/PythonScripts/'\
-                'AudioCutter/tests/dummy_outputs/0001 - book.mp3', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0001 - book.mp3').absolute()), 
                 id3v2_version=3, acodec='copy',
                 **expected_metadata_02)        
             
             expected_metadata_03 = {'metadata:g:0':'title=Prologue', 
                                     'metadata:g:1':'artist=Jane Doe', 
                                     'metadata:g:2':'track=3/3'}
-            ffmpeg_mock.output.assert_called_with('InputMock', 
-                '/home/jakub/Documents/PythonScripts/'\
-                'AudioCutter/tests/dummy_outputs/0002 - book.mp3', 
+            ffmpeg_mock.output.assert_any_call('InputMock', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0002 - book.mp3').absolute()), 
                 id3v2_version=3, acodec='copy',
                 **expected_metadata_03) 
 
-        # ADD TESTCASE WITH ARTWORK
     def test_cut_audio_tracks_ffmpeg_with_artwork(self):
             ffmpeg_mock = ffmpeg
             ffmpeg_mock.input = MagicMock(return_value='InputMock')
             ffmpeg_mock.output = MagicMock()
-            ffmpeg_mock.output.run = MagicMock(return_value=True)                  
+            ffmpeg_mock.output.run = MagicMock(return_value=True)   
+            dummy_artwork_path = \
+                str(pathlib.Path('./tests/artwork.jpg').absolute())             
             self.test_audiocutter.cut_audio_tracks_ffmpeg(
-                    list(self.test_cuesheet.tracks.values()))     
+                list(self.test_cuesheet.tracks.values()),
+                dummy_artwork_path)     
             ffmpeg_mock.input.assert_called()       
-            ffmpeg_mock.input.assert_not_called()
+
+            expected_metadata_01 = {'metadata:g:0':'title=Start', 
+                            'metadata:g:1':'artist=Jane Doe', 
+                            'metadata:g:2':'track=1/3',
+                            'metadata:s:v':f'file={dummy_artwork_path}'}
+            ffmpeg_mock.output.assert_any_call('InputMock', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0000 - book.mp3').absolute()), 
+                id3v2_version=3, acodec='copy',
+                **expected_metadata_01)  
+
+            expected_metadata_02 = {'metadata:g:0':'title=Dedication', 
+                            'metadata:g:1':'artist=Jane Doe', 
+                            'metadata:g:2':'track=2/3',
+                            'metadata:s:v':f'file={dummy_artwork_path}'}
+            ffmpeg_mock.output.assert_any_call('InputMock', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0001 - book.mp3').absolute()), 
+                id3v2_version=3, acodec='copy',
+                **expected_metadata_02)  
+
+            expected_metadata_03 = {'metadata:g:0':'title=Prologue', 
+                            'metadata:g:1':'artist=Jane Doe', 
+                            'metadata:g:2':'track=3/3',
+                            'metadata:s:v':f'file={dummy_artwork_path}'}
+            ffmpeg_mock.output.assert_any_call('InputMock', 
+                str(pathlib.Path(
+                './tests/dummy_outputs/0002 - book.mp3').absolute()), 
+                id3v2_version=3, acodec='copy',
+                **expected_metadata_03)  

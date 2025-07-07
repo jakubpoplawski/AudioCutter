@@ -1,10 +1,7 @@
 import unittest
-import subprocess, sys
+import subprocess
 
-from functools import wraps
-import io
-
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock
 
 patch('loggingSettings.logger_wrapper', lambda x: x).start()
    

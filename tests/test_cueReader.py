@@ -1,10 +1,6 @@
 import unittest
-from contextlib import redirect_stdout
-import io
 
-from functools import wraps
-
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch
 
 patch('loggingSettings.logger_wrapper', lambda x: x).start()
    
@@ -29,10 +25,12 @@ class test_CueSheet(unittest.TestCase):
     
     def test_eval_line(self):
         dummy_performer_line = 'PERFORMER "John Doe"\n'
-        tested_performer_line = self.test_cuesheet.execution_plan['performer']
-        self.assertEqual(self.test_cuesheet.eval_line(tested_performer_line, 
-                                                      dummy_performer_line), 
-                                                    "John Doe")
+        tested_performer_line = \
+            self.test_cuesheet.execution_plan['performer']
+        self.assertEqual(
+            self.test_cuesheet.eval_line(tested_performer_line, 
+                                        dummy_performer_line), 
+                                        "John Doe")
 
         dummy_album_title_line = 'TITLE "Book"\n'
         album_title_regex = self.test_cuesheet.execution_plan['title']

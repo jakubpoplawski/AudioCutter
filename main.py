@@ -40,7 +40,10 @@ def main():
     logger = logger_initialization("ffmpeg_audio_cutter.log") 
  
     logger.info('Parsing arguments.') 
-      
+    
+    # Could that be a separate module?  
+    # Neither ssh_upload_album or parser handles wrong input case.
+    # File type validation?
     parser = argparse.ArgumentParser(
         description="""A script to read a *.cue file and cut an 
         *.mp3 audiobook, and send it via SSH to a a remote device.""")
