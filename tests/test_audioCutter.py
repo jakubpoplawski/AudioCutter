@@ -13,7 +13,6 @@ from cueReader import CueSheet, CueTrack
 
 class test_audioCutter(unittest.TestCase):
     
-
     def setUp(self):
         with patch("builtins.open", 
                    mock_open(read_data="data")) as mock_file:
@@ -23,7 +22,6 @@ class test_audioCutter(unittest.TestCase):
         self.test_cuesheet = CueSheet('tests/dummy_cue.cue')
         self.test_cuesheet.sheet_reader_liner()
         self.test_cuesheet.add_ending_time()
-
         
     def tearDown(self):
         del self.test_audiocutter   

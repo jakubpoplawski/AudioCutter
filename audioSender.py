@@ -18,7 +18,6 @@ class SFTPClient():
         self.SSH_Client = paramiko.SSHClient()
 
 
-
     def ssh_connect(self):
         self.SSH_Client.load_system_host_keys()
         self.SSH_Client.set_missing_host_key_policy(
@@ -28,22 +27,13 @@ class SFTPClient():
                                 username=self.user, 
                                 password=self.password,
                                 look_for_keys=True,
-                                port=self.port)
-                                
+                                port=self.port)                       
             
     @logger_wrapper
     def ssh_scan_connect(self):
         for ip in self.ip_list:
             self.host_ip = ip
-            # with suppress(paramiko.ssh_exception.NoValidConnectionsError):
-            #     try:
-            #         self.ssh_connect()
-            #         print(f"Connected to {self.host_ip}:{self.port} as {self.user}.")
-            #         break
-            #     except TimeoutError as e:
-            #         continue
-            #     except Exception as e:
-            #         raise e
+
             try:
                 self.ssh_connect()
                 break
@@ -75,8 +65,6 @@ class SFTPClient():
             pass
         except IOError as e:
             sftp_client.put(local_track_path, remote_track_path)
-
-
 
     @logger_wrapper
     def ssh_upload_album(self, track_list, local_album_path, 

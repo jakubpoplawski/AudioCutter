@@ -4,6 +4,7 @@ import pathlib
 from dotenv import load_dotenv 
 import argparse
 
+from argumentParser import ArgumentParser
 from cueReader import CueSheet
 from audioCutter import AudioCutter
 from ipScanner import IPScanner
@@ -12,79 +13,29 @@ from audioSender import SFTPClient
 from portability import resource_path
 from loggingSettings import logger_initialization
 
-# local_file_path = '.test_files/source_files/skaza.mp3'
-# local_cue_sheet_path = '.test_files/source_files/skaza.cue'
-# local_cut_files_path = pathlib.Path(resource_path('.test_files/expected_files/'))
-# local_cut_files_path = '.test_files/expected_files/'
-# remote_file_path = 'Audiobooks/'
-
-local_file_path = '/home/jakub/Documents/dom/dom-na-wyrebach.mp3'
-local_cue_sheet_path = '/home/jakub/Documents/dom/dom-na-wyrebach.cue'
-local_artwork_path = '/home/jakub/Documents/dom/dom-na-wyrebach.jpeg'
-local_cut_files_path = '/home/jakub/Documents/dom/cut_files/'
-remote_file_path = 'Audiobooks/'
-
-
-sys.argv = ['main.py', '-f='+local_file_path,'-s='+local_cue_sheet_path,
-            '-a='+local_artwork_path, '-c='+str(local_cut_files_path), 
-            '-r='+remote_file_path]
-
 
 load_dotenv()
 
-
-
 def main():
-    
-
+    if __debug__:
+        sys.argv = ['main.py', 
+            '-f='+os.environ.get('LOCAL_FILE_PATH'),
+            '-s='+os.environ.get('LOCAL_CUE_SHEET_PATH'), 
+            '-a='+os.environ.get('LOCAL_ARTWORK_PATH'), 
+            '-c='+os.environ.get('LOCAL_CUT_FILES_PATH'), 
+            '-r='+os.environ.get('REMOTE_FILE_PATH')]
+    else:
+        pass
+       
     logger = logger_initialization("ffmpeg_audio_cutter.log") 
  
     logger.info('Parsing arguments.') 
     
-    # Could that be a separate module?  
-    # Neither ssh_upload_album or parser handles wrong input case.
-    # File type validation?
-    parser = argparse.ArgumentParser(
-        description="""A script to read a *.cue file and cut an 
-        *.mp3 audiobook, and send it via SSH to a a remote device.""")
-    parser.add_argument('-f','--file', 
-                        help='Path to the audiobook file', 
-                        required=True)
-    parser.add_argument('-s','--sheet', 
-                        help='Path to the cue sheet file', 
-                        required=True)
-    parser.add_argument('-a','--artwork', 
-                        help='Path to the artwork file', 
-                        required=False)   
-    parser.add_argument('-c','--cut', 
-                        help='Path to store cut mp3s locally', 
-                        required=True)
-    parser.add_argument('-r','--remote', 
-                        help='Path to remote target directory', 
-                        required=True)    
-    
-    args = parser.parse_args()
-
-    local_file_path = args.file
-    local_cue_sheet_path = args.sheet
-    local_artwork_path = args.artwork
-    local_cut_files_path = pathlib.Path(resource_path(args.cut))
-    remote_file_path = args.remote
-    
-    if not pathlib.Path(local_file_path).is_file():
-        logger.info("The local mp3 file doesn't exist in specified \
-            directory.")
-        raise SystemExit(1)
-    
-    if not pathlib.Path(local_cue_sheet_path).is_file():
-        logger.info("The local cue sheet file doesn't exist in \
-            specified directory.")
-        raise SystemExit(1)
-
-    if not pathlib.Path(local_cut_files_path).is_dir():
-        logger.info("The target file path to save cut files doesn't \
-            exist in specified directory.")
-        raise SystemExit(1)
+    arguement_parser = ArgumentParser()
+        
+    (local_file_path, local_cue_sheet_path, local_artwork_path, 
+    local_cut_files_path, remote_file_path) = \
+        arguement_parser.parse_arguments()
 
     logger.info('Extracting data from cue sheet file.')
     

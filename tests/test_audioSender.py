@@ -22,6 +22,7 @@ class test_SFTPClient(unittest.TestCase):
     def tearDown(self):
         del self.test_SFTPClient   
         
+        
     def test_ip_scanner_attributes(self):
         self.assertTrue(hasattr(self.test_SFTPClient, 
                                 'host_ip'))

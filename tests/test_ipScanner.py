@@ -10,7 +10,6 @@ from ipScanner import IPScanner
 
 class test_ipScanner(unittest.TestCase):
     
-
     def setUp(self):
         self.test_ip_scanner = IPScanner('0000', 
                                     '000.000.0.0/24',
@@ -18,6 +17,7 @@ class test_ipScanner(unittest.TestCase):
         
     def tearDown(self):
         del self.test_ip_scanner   
+        
         
     def test_ip_scanner_attributes(self):
         self.assertTrue(hasattr(self.test_ip_scanner, 

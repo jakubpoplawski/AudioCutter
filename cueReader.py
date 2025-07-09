@@ -15,7 +15,7 @@ class CueSheet():
         self.title = None
         self.album_file_name = None
         self.tracks = {}
-        self.execution_plan = {
+        self.exec_plan = {
             # album
             "performer": '^PERFORMER .(.*)\"\s', 
             "title": '^TITLE .(.*)\"\s',                                     
@@ -26,7 +26,8 @@ class CueSheet():
             "track_performer": '\s{2}PERFORMER .(.*)\"\s', 
             "track_file_name": '\s{2}REM .(.*)\"\s',                                     
             "track_title": '\s{2}TITLE .(.*)\"\s',
-            "track_start_index": '\s{2}INDEX 01 (\d{1,}\:\d{2}\:\d{2})\s?'                                            
+            "track_start_index": 
+                '\s{2}INDEX 01 (\d{1,}\:\d{2}\:\d{2})\s?'                                            
         }
 
  
@@ -34,57 +35,56 @@ class CueSheet():
     def eval_line(self, regex_pattern, input_line):
         try:
             match = re.match(regex_pattern, input_line)
-            if regex_pattern == self.execution_plan["track_beginning"]:
-                current_track_number = match.groups(0)[0]
-                self.tracks[current_track_number] = CueTrack()
-                return current_track_number, \
-                       self.tracks[current_track_number]                
+            if regex_pattern == self.exec_plan["track_beginning"]:
+                current_track = match.groups(0)[0]
+                self.tracks[current_track] = CueTrack()
+                return current_track, self.tracks[current_track]                
             return match.groups(0)[0]
         except AttributeError as e:
             pass
 
-  
     @logger_wrapper  
     def sheet_reader_liner(self):
-        current_track_name = None  
+        current_track = None  
         with open(self.file_location) as cue_file:
             for line in cue_file:
                 if not self.performer:
                     self.performer = self.eval_line(
-                        self.execution_plan["performer"], line)  
+                        self.exec_plan["performer"], line)  
                 if not self.title:               
                     self.title = self.eval_line(
-                        self.execution_plan["title"], line)                 
+                        self.exec_plan["title"], line)                 
                 if not self.album_file_name:
                     self.album_file_name = self.eval_line(
-                        self.execution_plan["file"], line)
+                        self.exec_plan["file"], line)
 
-                if re.match(self.execution_plan["track_beginning"], line):
-                    current_track_name, self.tracks[current_track_name] = \
+                if re.match(self.exec_plan["track_beginning"], line):
+                    current_track, self.tracks[current_track] = \
                         self.eval_line(
-                            self.execution_plan["track_beginning"], line)
-                    self.tracks[current_track_name].track_enumeration = \
-                        f"TRACK {current_track_name}"
-                    self.tracks[current_track_name].track_number = \
-                        int(current_track_name) + 1  
+                            self.exec_plan["track_beginning"], line)
+                    self.tracks[current_track].track_enumeration = \
+                        f"TRACK {current_track}"
+                    self.tracks[current_track].track_number = \
+                        int(current_track) + 1  
                                             
-                if current_track_name:
-                    if not self.tracks[current_track_name].track_performer:
-                        self.tracks[current_track_name].track_performer = \
-                        self.eval_line(
-                            self.execution_plan["track_performer"], line)                     
-                    if not self.tracks[current_track_name].track_file_name:
-                        self.tracks[current_track_name].track_file_name = \
-                        self.eval_line(
-                            self.execution_plan["track_file_name"], line)            
-                    if not self.tracks[current_track_name].track_title:
-                        self.tracks[current_track_name].track_title = \
-                        self.eval_line(
-                            self.execution_plan["track_title"], line)                           
-                    if not self.tracks[current_track_name].track_start_index:
-                        self.tracks[current_track_name].track_start_index = \
-                        self.eval_line(
-                            self.execution_plan["track_start_index"], line)
+                if current_track:
+                    if not self.tracks[current_track].track_performer:
+                        self.tracks[current_track].track_performer = \
+                            self.eval_line(
+                                self.exec_plan["track_performer"], line)                     
+                    if not self.tracks[current_track].track_file_name:
+                        self.tracks[current_track].track_file_name = \
+                            self.eval_line(
+                                self.exec_plan["track_file_name"], line)            
+                    if not self.tracks[current_track].track_title:
+                        self.tracks[current_track].track_title = \
+                            self.eval_line(
+                                self.exec_plan["track_title"], line)                           
+                    if not self.tracks[current_track].track_start_index:
+                        self.tracks[current_track].track_start_index = \
+                            self.eval_line(
+                                self.exec_plan["track_start_index"], 
+                                line)
 
     @logger_wrapper   
     def add_ending_time(self):
