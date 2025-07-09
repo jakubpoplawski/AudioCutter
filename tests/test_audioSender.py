@@ -12,7 +12,6 @@ from audioSender import SFTPClient
 
 
 class test_SFTPClient(unittest.TestCase):
-    
 
     def setUp(self):
         self.test_SFTPClient = SFTPClient('0000', 'blah', 'blahpass',
@@ -174,7 +173,6 @@ class test_SFTPClient(unittest.TestCase):
 
 class test_SFTPClient_ssh_upload_album(unittest.TestCase):
 
-
     def setUp(self):
         with patch("builtins.open", 
                    mock_open(read_data="data")) as mock_file:
@@ -192,6 +190,7 @@ class test_SFTPClient_ssh_upload_album(unittest.TestCase):
         del self.test_audiocutter   
         del self.test_cuesheet
         del self.test_SFTPClient
+    
         
     def test_ssh_upload_album(self):
         mock_SSHClient = self.test_SFTPClient.SSH_Client
