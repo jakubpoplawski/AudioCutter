@@ -2,15 +2,19 @@ import logging
 import argparse
 import pathlib
 
-from portability import resource_path
 from loggingSettings import logger_wrapper
-
 
 logger = logging.getLogger(__name__)
 
 class ArgumentParser():
     
     def __init__(self):
+        """A class to store and initialize the ArgumentParser class 
+        and validate the retrived arguments.
+
+        Parameters:
+            parser (class): ArgumentParser class.
+        """
         self.parser = argparse.ArgumentParser(
             description="""A script to read a *.cue file and cut an 
                         *.mp3 audiobook, and send it via SSH to 
@@ -18,7 +22,17 @@ class ArgumentParser():
 
 
     @logger_wrapper
-    def parse_arguments(self):       
+    def parse_arguments(self):
+        """The function builds the parser arguments handler, catches 
+        them, expands the paths, and shares for validation through 
+        validate_arguments function.
+
+        Args:
+            None
+        
+        Returns:
+            tuple (tuple): Collection of parsed and verifed arguments.           
+        """       
         self.parser.add_argument('-f','--file', 
                             help='Path to the audiobook file', 
                             required=True)
@@ -54,6 +68,22 @@ class ArgumentParser():
     @logger_wrapper
     def validate_arguments(self, file_path, cue_sheet_path, 
                            output_folder_path, artwork_path=None):
+        """The function checks the existance of passed file and 
+        directories paths and raises exceptions if the passed arguments 
+        don't pass validation.
+
+        Args:
+            file_path (str): Path to the source *.mp3 file.
+            cue_sheet_path (str): Path to the *.cue file.        
+            output_folder_path (str): Path to directory where output 
+                                      files will be stored. 
+            cue_sheet_path (str): Path to the *.cue file.  
+            artwork_path (str): Path to the *.jpeg, *.jpg or *.png 
+                                artwork file.                                                 
+        
+        Returns:
+            None           
+        """         
         if not pathlib.Path(file_path).is_file():
             logger.info("The local mp3 file doesn't exist in specified \
                 directory.")

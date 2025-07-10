@@ -92,3 +92,66 @@ class test_argumentParser(unittest.TestCase):
             self.assertEqual(parsed[3], 
                              '/home/Documents/the-book/output-files/')           
             self.assertEqual(parsed[4], 'Audiobooks/') 
+
+    def test_validate_arguments_with_artwork_wrong_format_error(self):
+        with patch("pathlib.Path.is_file") as mock_is_file:
+            with self.assertRaises(SystemExit):
+                mock_is_file.side_effect = [True, True, True]   
+                        
+                self.test_argumentparser.validate_arguments(        
+                            '/home/Documents/the-book/the-book.wav',
+                            '/home/Documents/the-book/the-book.cue',
+                            '/home/Documents/the-book/output-files/',
+                            '/home/Documents/the-book/the-book.jpg')
+
+    def test_validate_arguments_with_artwork_wrong_path_error(self):
+        with patch("pathlib.Path.is_file") as mock_is_file:
+            with self.assertRaises(SystemExit):
+                mock_is_file.side_effect = [False, True, True]   
+                        
+                self.test_argumentparser.validate_arguments(        
+                            '/home/Documents/the-book/the-book.mp3',
+                            '/home/Documents/the-book/the-book.cue',
+                            '/home/Documents/the-book/output-files/',
+                            '/home/Documents/the-book/the-book.jpg')     
+
+    def test_validate_arguments_with_artwork_not_dir_error(self):
+        with patch("pathlib.Path.is_file") as mock_is_file:
+            with patch("pathlib.Path.is_dir") as mock_is_dir:
+                with self.assertRaises(SystemExit):
+                    mock_is_file.side_effect = [True, True, True]
+                    mock_is_dir.return_value = False   
+                         
+                    self.test_argumentparser.validate_arguments(        
+                            '/home/Documents/the-book/the-book.mp3',
+                            '/home/Documents/the-book/the-book.cue',
+                            '/home/Documents/the-book/output-files/',
+                            '/home/Documents/the-book/the-book.jpg')          
+
+    def test_validate_arguments_with_wrong_artwork_error(self):
+        with patch("pathlib.Path.is_file") as mock_is_file:
+            with patch("pathlib.Path.is_dir") as mock_is_dir:
+                with self.assertRaises(SystemExit):
+                    mock_is_file.side_effect = [True, True, True]
+                    mock_is_dir.return_value = True  
+                         
+                    self.test_argumentparser.validate_arguments(        
+                            '/home/Documents/the-book/the-book.mp3',
+                            '/home/Documents/the-book/the-book.cue',
+                            '/home/Documents/the-book/output-files/',
+                            '/home/Documents/the-book/the-book.svg')         
+        
+    def test_validate_arguments_no_artwork(self):
+        with patch("pathlib.Path.is_file") as mock_is_file:
+            with patch("pathlib.Path.is_dir") as mock_is_dir:
+                mock_is_file.side_effect = [True, True, True]
+                mock_is_dir.return_value = True      
+                  
+                self.test_argumentparser.validate_arguments(         
+                        '/home/Documents/the-book/the-book.mp3',
+                        '/home/Documents/the-book/the-book.cue',
+                        '/home/Documents/the-book/output-files/')
+                
+                self.assertEqual(mock_is_file.call_count, 2)
+                self.assertEqual(mock_is_dir.call_count, 1)
+                

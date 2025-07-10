@@ -10,23 +10,48 @@ logger = logging.getLogger(__name__)
 class AudioCutter():
     
     def __init__(self, source_path, output_path):
+        """A class to store functions and paths to cut the source *.mp3
+        file into chapters with accordance to the *.cue file.
+
+        Parameters:
+            source_path (str): Path to the source file.
+            output_path (str): Path to the output directory.
+        """
         self.source_path = pathlib.Path(resource_path(source_path))
         self.output_path = pathlib.Path(resource_path(output_path))   
 
 
     @logger_wrapper
     def time_to_miliseconds(self, input_time):
+        """The function recalculates MM:SS:FF cue time index format 
+        to miliseconds timestamp.
+
+        Args:
+            input_time (str): MM:SS:FF cue time index.
+        
+        Returns:
+            float (float): Timestamp in miliseconds.           
+        """  
         try:
             temp_time = list(map(int, input_time.split(":")))
         except ValueError as e:
             raise e
-        # CUE time is in MM:SS:FF format
+
         return (temp_time[0] * 60 * 1000 
                + temp_time[1] * 1000 
                + temp_time[2] * (4 / 3))
 
     @logger_wrapper
     def time_to_seconds(self, input_time):
+        """The function recalculates MM:SS:FF cue time index format 
+        to seconds timestamp.
+
+        Args:
+            input_time (str): MM:SS:FF cue time index.
+        
+        Returns:
+            float (float): Timestamp in seconds.           
+        """  
         try:
             temp_time = list(map(int, input_time.split(":")))
         except ValueError as e:
@@ -37,6 +62,19 @@ class AudioCutter():
     @logger_wrapper         
     def cut_audio_tracks_ffmpeg(self, track_list, 
                                 artwork_file_path=None):
+        """The function takes the list of tracks with their data created 
+        from scrapping the *.cue file and creates *.mp3 files with 
+        source file chapters through ffmpeg command.
+
+        Args:
+            track_list (list): List of CueTrack objects storing track 
+                               data.
+            artwork_file_path (str): Path to artwork to append as 
+                                     metadata.
+        
+        Returns:
+            None        
+        """        
         track_list_length = len(track_list)
         for i in range(track_list_length):
             track_path = \

@@ -6,11 +6,11 @@ def resource_path(relative_path):
     paths for optional portability via PyInstaller.
 
     Args:
-        None
+        relative_path (str): Path in a form of a string.
     """
-
     try:
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
+        
     return os.path.join(base_path, relative_path)

@@ -10,6 +10,18 @@ logger = logging.getLogger(__name__)
 class CueSheet():
     
     def __init__(self, file_location):
+        """A class to store functions to collect data from the *.cue 
+        file and store it its parameters.
+
+        Parameters:
+            file_location (Path class): Location of the *.cue file.
+            performer (str): Album performer.  
+            title (str): Title of the album.
+            album_file_name (str): File name with the extension.
+            tracks (dict): Dictionary of the collected tracks. 
+            exec_plan (dict): Dictionary with the regexes to collect 
+                              the line data from the *.cue file.                                              
+        """
         self.file_location = pathlib.Path(resource_path(file_location))
         self.performer = None
         self.title = None
@@ -33,6 +45,16 @@ class CueSheet():
  
     @logger_wrapper              
     def eval_line(self, regex_pattern, input_line):
+        """The function checks a file line with a regex pattern and 
+        returns data if match was found.
+
+        Args:
+            regex_pattern (str): Regex pattern.
+            input_line (str): Line evaluated in the *.cue file.   
+        
+        Returns:
+            string (str): Match if cought with the regex pattern.           
+        """  
         try:
             match = re.match(regex_pattern, input_line)
             if regex_pattern == self.exec_plan["track_beginning"]:
@@ -45,6 +67,15 @@ class CueSheet():
 
     @logger_wrapper  
     def sheet_reader_liner(self):
+        """The function opens the *.cue file and controls the flow of 
+        data extraction.
+
+        Args:
+            None
+        
+        Returns:
+            None        
+        """  
         current_track = None  
         with open(self.file_location) as cue_file:
             for line in cue_file:
@@ -88,6 +119,15 @@ class CueSheet():
 
     @logger_wrapper   
     def add_ending_time(self):
+        """The function adds to the collected tracks metadata 
+        the information on the ending timestaps of the cut files.
+
+        Args:
+            None
+        
+        Returns:
+            None        
+        """ 
         prev_track = None
         for track in self.tracks.values():
             if track.track_enumeration == "TRACK 00":
@@ -101,6 +141,21 @@ class CueSheet():
 class CueTrack():
 
     def __init__(self):
+        """A class to store the collected data from the *.cue 
+        on specific tracks.
+
+        Parameters:
+            track_number (int): Track number starting from 1.
+            track_enumeration (int): Cue track number starting from 
+                                     TRACK 00.
+            track_performer (str): Perfomer of the each track.
+            track_file_name (str): File name with the extension.
+            track_title (str): Title of each section.  
+            track_start_index (str): Starting timestamp of a track in 
+                                     MM:SS:FF cue format.   
+            track_end_index (str): Ending timestamp of a track in 
+                                   MM:SS:FF cue format.                                                  
+        """
         self.track_number = None
         self.track_enumeration = None
         self.track_performer = None
