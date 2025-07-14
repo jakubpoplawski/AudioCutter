@@ -55,7 +55,7 @@ class ArgumentParser():
         cue_sheet_path = args.sheet
         artwork_path = args.artwork \
                         if args.artwork else None 
-        output_folder_path = str(pathlib.Path(args.cut))
+        output_folder_path = args.cut
         remote_folder_path = args.remote
         
 
