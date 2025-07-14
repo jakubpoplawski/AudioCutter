@@ -51,12 +51,12 @@ class ArgumentParser():
     
         args = self.parser.parse_args()
         
-        file_path = str(pathlib.Path(args.file))
-        cue_sheet_path = str(pathlib.Path(args.sheet))
-        artwork_path = str(pathlib.Path(args.artwork)) \
+        file_path = args.file
+        cue_sheet_path = args.sheet
+        artwork_path = args.artwork \
                         if args.artwork else None 
         output_folder_path = str(pathlib.Path(args.cut))
-        remote_folder_path = str(pathlib.Path(args.remote))
+        remote_folder_path = args.remote
         
 
         self.validate_arguments(file_path, cue_sheet_path, 
