@@ -1,5 +1,5 @@
 # AudioCutter
-The below repository contains a command line script cuts a .mp3 audio file into pieces according to indices provided in a .cue file. Audioteka doesn't provide a program for Linux program to cut their audiobooks into chapters. Here's a small script that does exatly that.
+The below repository contains a command line script cuts a .mp3 audio file into pieces according to indices provided in a .cue file. Audioteka doesn't provide a program for Linux to cut their audiobooks into chapters. Here's a small script that does exatly that.
  
 ## Overview
 The logic of the script is divided in five parts represented with five different modules responsible for extracting data from a .cue file, cutting the .mp3 file, finding the reciever in the local network, and sending the splitted files to the target device.
